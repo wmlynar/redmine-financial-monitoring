@@ -18,17 +18,17 @@
 var datas = [
   <% 
   current = 0 
-  prev = 0 
+  prev = @charts_settings.day != nil ? @charts_settings.day : 0
   @stats.each do |stat| 
-    current += stat[2] 
-    prev += @charts_settings.day != nil ? @charts_settings.day : 0 %>
-    { y: '<%= stat[0] %>-<%= stat[1].to_s.rjust(2, '0') %>-01', 
+    current += stat[3] 
+  %>
+    { y: '<%= stat[0] %>-<%= stat[1].to_s.rjust(2, '0') %>-<%= stat[2] %>', 
       a: '<%= current %>',
       b: '<%= prev %>' },
   <% end %>  
 ];
-var prevPerMonth = <%= @charts_settings.day != nil && @charts_settings.day != '' ? @charts_settings.day : 0 %>;
-if (datas.length < 12) {
+var prevPerMonth = 0;
+if (datas.length > 0) {
   var date = null;
   if (datas.length) {
     date = new Date(datas[datas.length-1].y), latestPrev = datas[datas.length-1].b;
@@ -36,8 +36,9 @@ if (datas.length < 12) {
     date = new Date(), latestPrev = 0;
   }
   
+  // wykres na 12 miechow do przodu
+  for(var i=0; i<12; i++) {
 
-  for (var i=datas.length; i<12; i++) {
     date = new Date(date.setMonth(date.getMonth()+1));
     
     var dateAsString = date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDay(),
@@ -50,6 +51,9 @@ if (datas.length < 12) {
   }
 }
 new Morris.Line({
+//  goals: [100.0, -1.0],
+  smooth: false,
+  ymin: 0,
   element: 'chart',
   data: datas,
   xkey: 'y',
